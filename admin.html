@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Área do Administrador</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef1f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 50px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    input, textarea, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .post {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 8px;
+      background-color: #fafafa;
+    }
+
+    .post h3 {
+      margin: 0 0 10px;
+    }
+
+    .post p {
+      margin: 5px 0;
+    }
+
+    .logout {
+      float: right;
+      margin-top: -50px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Área do Administrador</h1>
+    <div class="logout" id="logoutDiv" style="display:none;">
+      <button onclick="logout()">Sair</button>
+    </div>
+
+    <!-- Login -->
+    <div id="loginAdmin">
+      <h2>Login</h2>
+      <input type="password" id="senha" placeholder="Digite a senha de admin" />
+      <button onclick="fazerLogin()">Entrar</button>
+    </div>
+
+    <!-- Painel de Admin -->
+    <div id="painel" style="display:none;">
+      <h2>Novo Post</h2>
+      <input type="text" id="titulo" placeholder="Título do post" />
+      <textarea id="conteudo" rows="5" placeholder="Escreva o conteúdo..."></textarea>
+      <button onclick="publicar()">Publicar</button>
+
+      <h2>Posts Publicados</h2>
+      <div id="listaPosts"></div>
+    </div>
+  </div>
+
+  <script>
+    const senhaCorreta = "1234"; // sua senha de admin
+
+    // Verifica login ao abrir a página
+    window.onload = () => {
+      if (localStorage.getItem("admin") === "logado") {
+        mostrarPainel();
+      }
+    };
+
+    function fazerLogin() {
+      const senha = document.getElementById("senha").value;
+      if (senha === senhaCorreta) {
+        localStorage.setItem("admin", "logado");
+        mostrarPainel();
+      } else {
+        alert("Senha incorreta!");
+      }
+    }
+
+    function mostrarPainel() {
+      document.getElementById("loginAdmin").style.display = "none";
+      document.getElementById("painel").style.display = "block";
+      document.getElementById("logoutDiv").style.display = "block";
+      mostrarPostsAdmin();
+    }
+
+    function logout() {
+      localStorage.removeItem("admin");
+      location.reload();
+    }
+
+    function publicar() {
+      const titulo = document.getElementById("titulo").value;
+      const conteudo = document.getElementById("conteudo").value;
+      const data = new Date().toLocaleDateString("pt-BR");
+
+      if (titulo && conteudo) {
+        const novoPost = { titulo, conteudo, data };
+        let posts = JSON.parse(localStorage.getItem("posts")) || [];
+        posts.unshift(novoPost);
+        localStorage.setItem("posts", JSON.stringify(posts));
+
+        document.getElementById("titulo").value = "";
+        document.getElementById("conteudo").value = "";
+        mostrarPostsAdmin();
+        alert("Post publicado com sucesso!");
+      } else {
+        alert("Preencha todos os campos.");
+      }
+    }
+
+    function mostrarPostsAdmin() {
+      const lista = document.getElementById("listaPosts");
+      let posts = JSON.parse(localStorage.getItem("posts")) || [];
+
+      lista.innerHTML = ""; // limpa
+      if (posts.length === 0) {
+        lista.innerHTML = "<p>Nenhum post ainda.</p>";
+        return;
+      }
+
+      posts.forEach((post, index) => {
+        const div = document.createElement("div");
+        div.classList.add("post");
+        div.innerHTML = `
+          <h3>${post.titulo}</h3>
+          <p><em>${post.data}</em></p>
+          <p>${post.conteudo}</p>
+          <button onclick="deletarPost(${index})">🗑 Apagar</button>
+        `;
+        lista.appendChild(div);
+      });
+    }
+
+    function deletarPost(indice) {
+      if (confirm("Tem certeza que deseja apagar este post?")) {
+        let posts = JSON.parse(localStorage.getItem("posts")) || [];
+        posts.splice(indice, 1);
+        localStorage.setItem("posts", JSON.stringify(posts));
+        mostrarPostsAdmin();
+      }
+    }
+  </script>
+
+</body>
+</html>

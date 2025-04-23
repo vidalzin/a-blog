@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meu blog</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #1a1a1a;
+      color: white;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header, footer {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    nav a {
+      margin: 0 10px;
+      color: white;
+      text-decoration: none;
+    }
+    article {
+      background-color: #333;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    input, button {
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 5px;
+      border: none;
+    }
+    .btn-curtir {
+      background-color: #555;
+      color: white;
+      cursor: pointer;
+      border-radius: 20px;
+    }
+    .form-box {
+      background-color: #222;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+    }
+    #usuario-info {
+      margin: 10px 0;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+    <div id="botao-perfil">
+        <a href="perfil.html">👤 </a>
+      </div>
+  <header>
+    <h1>Meu Blog</h1>
+    <p>esse blog conta um pouquinho de mim</p>
+    <div id="usuario-info"></div>
+    <nav>
+      <span id="nav-publico">
+        <a href="#" onclick="mostrarSessao('login')">Login</a>
+        <a href="#" onclick="mostrarSessao('cadastro')">Cadastro</a>
+      </span>
+      <span id="nav-logado" style="display: none;">
+        <a href="index.html">Início</a>
+        <a href="sobre.html">Sobre</a>
+        <a href="contato.html">Contato</a>
+        <a href="#" onclick="logout()">Sair</a>
+      </span>
+    </nav>
+  </header>
+
+  <div id="sessao-cadastro" class="form-box" style="display:none;">
+    <h3>Cadastro</h3>
+    <input type="text" id="nome" placeholder="Nome" required><br>
+    <input type="email" id="email" placeholder="E-mail" required><br>
+    <input type="password" id="senha" placeholder="Senha" required><br>
+    <button onclick="cadastrar()">Cadastrar</button>
+  </div>
+
+  <div id="sessao-login" class="form-box" style="display:none;">
+    <h3>Login</h3>
+    <input type="email" id="loginEmail" placeholder="E-mail"><br>
+    <input type="password" id="loginSenha" placeholder="Senha"><br>
+    <button onclick="login()">Entrar</button>
+  </div>
+
+  <main id="posts"></main>
+
+  <footer>
+    <p>Feito por um cara qualquer.</p>
+  </footer>
+
+  <script>
+    let posts = JSON.parse(localStorage.getItem("posts")) || [
+      {
+        titulo: "Primeiro Post",
+        data: new Date().toLocaleDateString(),
+        conteudo: "Esse é o meu primeiro post no blog. Estou aprendendo a programar e tá sendo muito divertido!"
+      }
+    ];
+
+    let curtidas = JSON.parse(localStorage.getItem("curtidas")) || {};
+    let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+    let usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+
+    function mostrarSessao(sessao) {
+      document.getElementById("sessao-login").style.display = sessao === "login" ? "block" : "none";
+      document.getElementById("sessao-cadastro").style.display = sessao === "cadastro" ? "block" : "none";
+    }
+
+    async function gerarHash(senha) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(senha);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function cadastrar() {
+      const nome = document.getElementById("nome").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const senha = document.getElementById("senha").value;
+
+      if (!nome || !email.includes("@") || senha.length < 4) {
+        alert("Preencha corretamente todos os campos!");
+        return;
+      }
+
+      if (usuarios.some(u => u.email === email)) {
+        alert("E-mail já cadastrado!");
+        return;
+      }
+
+      const senhaHash = await gerarHash(senha);
+      usuarios.push({ nome, email, senha: senhaHash });
+      localStorage.setItem("usuarios", JSON.stringify(usuarios));
+      alert("Cadastro realizado com sucesso!");
+      mostrarSessao("login");
+    }
+
+    async function login() {
+      const email = document.getElementById("loginEmail").value.trim();
+      const senha = document.getElementById("loginSenha").value;
+      const senhaHash = await gerarHash(senha);
+
+      const usuario = usuarios.find(u => u.email === email && u.senha === senhaHash);
+      if (!usuario) {
+        alert("Login inválido!");
+        return;
+      }
+
+      usuarioLogado = usuario;
+      localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
+      alert("Login realizado com sucesso!");
+      mostrarSessao("");
+      mostrarPosts();
+      atualizarNavegacao();
+    }
+
+    function logout() {
+      localStorage.removeItem("usuarioLogado");
+      usuarioLogado = null;
+      mostrarPosts();
+      atualizarNavegacao();
+    }
+
+    function atualizarNavegacao() {
+      const navPublico = document.getElementById("nav-publico");
+      const navLogado = document.getElementById("nav-logado");
+      const userInfo = document.getElementById("usuario-info");
+
+      if (usuarioLogado) {
+        navPublico.style.display = "none";
+        navLogado.style.display = "inline";
+        userInfo.textContent = `Olá, ${usuarioLogado.nome}`;
+      } else {
+        navPublico.style.display = "inline";
+        navLogado.style.display = "none";
+        userInfo.textContent = "";
+      }
+    }
+
+    function curtir(index) {
+      if (!usuarioLogado) {
+        alert("Você precisa estar logado para curtir.");
+        return;
+      }
+
+      const chave = `${usuarioLogado.email}-${index}`;
+      if (curtidas[chave]) {
+        alert("Você já curtiu esse post.");
+        return;
+      }
+
+      curtidas[chave] = true;
+      localStorage.setItem("curtidas", JSON.stringify(curtidas));
+      mostrarPosts();
+    }
+
+    function mostrarPosts() {
+      const container = document.getElementById("posts");
+      container.innerHTML = "";
+
+      posts.forEach((post, index) => {
+        const totalCurtidas = Object.keys(curtidas).filter(k => k.endsWith(`-${index}`)).length;
+
+        container.innerHTML += `
+          <article>
+            <h2>${post.titulo}</h2>
+            <p><em>${post.data}</em></p>
+            <p>${post.conteudo}</p>
+            <button class="btn-curtir" onclick="curtir(${index})">❤️ Curtir (${totalCurtidas})</button>
+          </article>
+        `;
+      });
+    }
+
+    mostrarPosts();
+    atualizarNavegacao();
+  </script>
+</body>
+</html>

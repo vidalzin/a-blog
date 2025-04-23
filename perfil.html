@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Meu Perfil</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #1a1a1a;
+      color: white;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header, footer {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    nav a {
+      margin: 0 10px;
+      color: white;
+      text-decoration: none;
+    }
+    article {
+      background-color: #333;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    input, button {
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      background-color: #555;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div id="botao-perfil">
+  <a href="perfil.html">👤
+  </a>
+</div>
+
+  <header>
+    <h1>Meu Blog</h1>
+    <nav>
+      <span id="nav-publico">
+        <a href="index.html">Início</a>
+        <a href="sobre.html">Sobre</a>
+        <a href="contato.html">Contato</a>
+        <a href="index.html">Login</a>
+        <a href="index.html">Cadastro</a>
+      </span>
+      <span id="nav-logado" style="display: none;">
+        <a href="index.html">Início</a>
+        <a href="sobre.html">Sobre</a>
+        <a href="contato.html">Contato</a>
+        <a href="perfil.html">Perfil</a>
+        <a href="#" onclick="logout()">Sair</a>
+      </span>
+    </nav>
+  </header>
+
+  <main id="perfil-container"></main>
+
+  <footer>
+    <p>Feito por um cara qualquer.</p>
+  </footer>
+
+  <script>
+    let usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+    let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+    let curtidas = JSON.parse(localStorage.getItem("curtidas")) || {};
+    let posts = JSON.parse(localStorage.getItem("posts")) || [];
+
+    const container = document.getElementById("perfil-container");
+
+    if (!usuarioLogado) {
+      alert("Você precisa estar logado para ver seu perfil.");
+      location.href = "index.html";
+    }
+
+    function atualizarUsuario() {
+      const novoNome = document.getElementById("novo-nome").value.trim();
+      const novaSenha = document.getElementById("nova-senha").value.trim();
+
+      if (novoNome) usuarioLogado.nome = novoNome;
+      if (novaSenha.length >= 4) usuarioLogado.senha = novaSenha;
+
+      const index = usuarios.findIndex(u => u.email === usuarioLogado.email);
+      usuarios[index] = usuarioLogado;
+
+      localStorage.setItem("usuarios", JSON.stringify(usuarios));
+      localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
+
+      alert("Perfil atualizado com sucesso!");
+      location.reload();
+    }
+
+    function montarPerfil() {
+      const curtidos = Object.keys(curtidas)
+        .filter(k => k.startsWith(usuarioLogado.email))
+        .map(k => parseInt(k.split("-")[1]));
+
+      const postsCurtidos = posts.filter((_, i) => curtidos.includes(i));
+
+      container.innerHTML = `
+        <h2>Meu Perfil</h2>
+        <p><strong>Nome:</strong> ${usuarioLogado.nome}</p>
+        <p><strong>E-mail:</strong> ${usuarioLogado.email}</p>
+
+        <h3>Editar Perfil</h3>
+        <input type="text" id="novo-nome" placeholder="Novo nome" /><br>
+        <input type="password" id="nova-senha" placeholder="Nova senha (min. 4 caracteres)" /><br>
+        <button onclick="atualizarUsuario()">Salvar Alterações</button>
+
+        <h3>Posts Curtidos</h3>
+        ${postsCurtidos.map(p => `<article><h4>${p.titulo}</h4><p>${p.conteudo}</p></article>`).join("")}
+      `;
+    }
+
+    function logout() {
+      localStorage.removeItem("usuarioLogado");
+      location.href = "index.html";
+    }
+
+    function atualizarNavegacao() {
+      const navPublico = document.getElementById("nav-publico");
+      const navLogado = document.getElementById("nav-logado");
+
+      if (usuarioLogado) {
+        navPublico.style.display = "none";
+        navLogado.style.display = "inline";
+      } else {
+        navPublico.style.display = "inline";
+        navLogado.style.display = "none";
+      }
+    }
+
+    montarPerfil();
+    atualizarNavegacao();
+  </script>
+</body>
+</html>

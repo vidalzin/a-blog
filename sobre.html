@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sobre mim</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #1a1a1a;
+      color: white;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header, footer {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    nav a {
+      margin: 0 10px;
+      color: white;
+      text-decoration: none;
+    }
+    .form-box, .content-box {
+      background-color: #333;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    #usuario-logado {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #00ff88;
+    }
+  </style>
+</head>
+<body>
+  <div id="botao-perfil">
+    <a href="perfil.html">👤 </a>
+  </div>
+  <header>
+    <h1>Sobre mim</h1>
+    <p>Aqui vocês conhecem um pouco sobre mim</p>
+    <p id="usuario-logado"></p>
+    <nav>
+      <span id="nav-publico">
+        <a href="index.html">Início</a>
+        <a href="#" onclick="mostrarSessao('login')">Login</a>
+        <a href="#" onclick="mostrarSessao('cadastro')">Cadastro</a>
+      </span>
+      <span id="nav-logado" style="display: none;">
+        <a href="cadastro e login.html">Início</a>
+        <a href="sobre.html">Sobre</a>
+        <a href="contato.html">Contato</a>
+        <a href="#" onclick="logout()">Sair</a>
+      </span>
+    </nav>
+  </header>
+
+  <div class="content-box">
+    <h2>Quem sou eu?</h2>
+    <p>
+      Quem sou eu? essa é uma pergunta que também me vem a mente as vezes, sou um jovem de 18 anos, e sentia que as redes socias me prendiam
+      e eu não tinha a privacidade que deveria, mas por aqui, por aqui eu posso ser quem eu sou, posso contar sobre coisas da minha vida, mostrar meus poemas pro mundo,
+      ser quem eu sou de verdade!
+      Mas agora falando sobre mim de novo, eu sou um jovem como todos, talvez esteja meio que fazendo um blog em pleno 2025, que coisa sem nexo, hoje temos o twitter,
+      instagram, snapchat, mas eu sou diferente, tenho o meu blog!
+    </p>
+  </div>
+
+  <footer>
+    <p>Feito por alguém.</p>
+  </footer>
+
+  <script>
+    let usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+
+    function logout() {
+      localStorage.removeItem("usuarioLogado");
+      location.reload();
+    }
+
+    function atualizarNavegacao() {
+      const navPublico = document.getElementById("nav-publico");
+      const navLogado = document.getElementById("nav-logado");
+      const nomeUsuario = document.getElementById("usuario-logado");
+
+      if (usuarioLogado) {
+        navPublico.style.display = "none";
+        navLogado.style.display = "inline";
+        nomeUsuario.textContent = `Bem-vindo, ${usuarioLogado.nome}!`;
+      } else {
+        navPublico.style.display = "inline";
+        navLogado.style.display = "none";
+        nomeUsuario.textContent = "";
+      }
+    }
+
+    atualizarNavegacao();
+  </script>
+</body>
+</html>

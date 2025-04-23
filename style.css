@@ -1,0 +1,121 @@
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meu Blog</title>
+
+  <!-- Importando a fonte do Google Fonts -->
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+    body {
+      font-family: 'Inter', sans-serif;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(to right, #000000,#ffffff);
+      color: #fff8f8;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 20px;
+      background: linear-gradient(to right, #000000, #ffffff);
+      color: rgb(255, 255, 255);
+      border-radius: 10px;
+    }
+
+    header h1 {
+      margin-bottom: 10px;
+    }
+
+    article {
+      background-color: rgb(78, 68, 68);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+    }
+
+    article img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #000000;
+    }
+
+    nav {
+      margin-top: 15px;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: white;
+      background-color: rgba(255, 255, 255, 0.2);
+      padding: 8px 16px;
+      margin: 0 8px;
+      border-radius: 20px;
+      transition: background 0.3s;
+    }
+
+    nav a:hover {
+      background-color: rgba(255, 255, 255, 0.4);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      header h1 {
+        font-size: 28px;
+      }
+
+      header p {
+        font-size: 16px;
+      }
+
+      nav a {
+        display: block;
+        margin: 8px 0;
+        text-align: center;
+      }
+
+      article img {
+        width: 100%;
+        height: auto;
+      }
+
+      .botao {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    .curtir {
+      background: none;
+      border: 1px solid #ccc;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      color: white;
+      transition: background 0.2s ease;
+      margin-top: 10px;
+    }
+
+    .curtir:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .curtir:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
