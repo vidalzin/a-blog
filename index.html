@@ -200,25 +200,6 @@
       localStorage.setItem("curtidas", JSON.stringify(curtidas));
       mostrarPosts();
     }
-
-    function mostrarPosts() {
-      const container = document.getElementById("posts");
-      container.innerHTML = "";
-
-      posts.forEach((post, index) => {
-        const totalCurtidas = Object.keys(curtidas).filter(k => k.endsWith(`-${index}`)).length;
-
-        container.innerHTML += `
-          <article>
-            <h2>${post.titulo}</h2>
-            <p><em>${post.data}</em></p>
-            <p>${post.conteudo}</p>
-            <button class="btn-curtir" onclick="curtir(${index})">❤️ Curtir (${totalCurtidas})</button>
-          </article>
-        `;
-      });
-    }
-
     mostrarPosts();
     atualizarNavegacao();
   </script>
